@@ -618,6 +618,7 @@ class NailBox(Problem):
         self.goal = goal
         self.initial = initial
         self.lastPos = 0
+        self.count = 0
         Problem.__init__(self, initial, goal)
         def actions(self, state):
             possible_actions = ['Get', 'Put', 'Hammer']
