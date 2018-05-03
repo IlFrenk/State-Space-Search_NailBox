@@ -526,7 +526,7 @@ class EightPuzzle(Problem):
 class Fontana(Problem):
 
 
-    def __init__(self, initial, goal):
+    def __init__(self, initial, goal = {'a':0, 'b':3}):
         """ Define goal state and initialize a problem """
 
         self.goal = goal
@@ -609,114 +609,113 @@ class Fontana(Problem):
         return sum(s != g for (s, g) in zip(node.state, self.goal))
 
 # __________
+
 class NailBox(Problem):
-    #a = scatola, b = coperchio, c = chiodo
-    #la prima posizione è il braccio: 0 libero, 1 occupato
-    def __init__(self, initial = ((0, 0), (1, a, b, c), (2, a), (3, b, a), (4, c), (5, b, c), (6, 0)), goal = ((0, 0), (), (), (), (), (), ())):
+    #a = scatola, b = coperchio, c = chiodo, 0 = vuoto
+    #la posizione 0 è il braccio: 0 libero, 1 occupato
+    def __init__(self, initial, goal = ((0, 0), (), (), (), (), (), ())):
 
-    self.goal = goal
-    Problem.__init__(self, initial, goal)
-    def actions(self, state):
-        possible_actions = ['GetA', 'GetB', 'GetC', 'PutAtoB', 'PutBtoA', 'PutAtoC', 'PutBtoC', 'PutCtoA', 'PutCtoB', 'Hammer']
+        self.goal = goal
+        self.initial = initial
+        self.lastPos = 0
+        Problem.__init__(self, initial, goal)
+        def actions(self, state):
+            possible_actions = ['Get', 'Put', 'Hammer']
 
+            vett = []
+            for i in state:
+                vett.append(list(i))
 
-
-        vett = []
-        for i in state:
-            vett.append(list(i))
-
-        for posiz in range(1, len(vett)):
-
-            #for posiz2 in range(1, len(???)):
-
-            if(vett[0][1] == 0):
-                #se il braccio è libero:
-                possible_actions.remove('PutAtoB')
-                possible_actions.remove('PutBtoA')
-                possible_actions.remove('PutAtoC')
-                possible_actions.remove('PutBtoC')
-                possible_actions.remove('PutCtoA')
-                possible_actions.remove('PutCtoB')
-                if(vett[posiz][1] == 'a'):
-                    possible_actions.remove('GetB')
-                    possible_actions.remove('GetC')
-                    possible_actions.remove('Hammer')
-                elif(vett[posiz][1] == 'b'):
-                    possible_actions.remove('GetA')
-                    possible_actions.remove('GetC')
-                    possible_actions.remove('Hammer')
-                elif(vett[posiz][1] == 'c'):
-                    possible_actions.remove('GetA')
-                    possible_actions.remove('GetB')
-
-                    #da controllare posiz2!
-                    if(vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
+            for posiz in range(1, len(vett)):
+                #for posiz2 in range(1, len(???)):
+                if(vett[0][1] == 0):
+                    #se il braccio è libero:
+                    possible_actions.remove('Put')
+                    #posiz2!
+                    if(vett[posiz][1] != c or vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
                         possible_actions.remove('Hammer')
-            else:
-                #se il braccio è occupato:
-                possible_actions.remove('GetA')
-                possible_actions.remove('GetB')
-                possible_actions.remove('GetC')
-                possible_actions.remove('Hammer')
-                if(vett[0][1] == 'a'):
-                    possible_actions.remove('PutBtoA')
-                    possible_actions.remove('PutBtoC')
-                    possible_actions.remove('PutCtoA')
-                    possible_actions.remove('PutCtoB')
-                elif(vett[0][1] == 'b'):
-                    possible_actions.remove('PutAtoB')
-                    possible_actions.remove('PutAtoC')
-                    possible_actions.remove('PutCtoA')
-                    possible_actions.remove('PutCtoB')
-                elif(vett[0][1] == 'c'):
-                    possible_actions.remove('PutAtoB')
-                    possible_actions.remove('PutAtoC')
-                    possible_actions.remove('PutBtoA')
-                    possible_actions.remove('PutBtoC')
+                else:
+                    #se il braccio è occupato:
+                    possible_actions.remove('Get')
+                    possible_actions.remove('Hammer')
+
+            return possible_actions
 
 
 
-    def result(self, state, action):
-        new_state = []
-        l = len(state)
-        for k in state:
-            j = list(k)
-            new_state.append(j)
+        def result(self, state, action):
+            new_state = []
+            for k in range(1, len(state)):
+                j = list(k)
+                new_state.append(j)
 
-        vett = []
-        for i in state:
-            vett.append(list(i))
+            vett = []
+            for i in state:
+                vett.append(list(i))
 
-        for posiz in range(1, len(vett)):
-            if(action == 'GetA'):
-                vett[posiz][1] = 0
 
-        new_tuple = []
+            if(action == 'Get'):
+                for posiz in range(1, len(vett)):
+                    if(vett[posiz][1] != 0):
+                        vett[0][1] = vett[posiz][1]
+                        self.lastPos = posiz
+                        del vett[posiz][1]
+                        if(len(vett[posiz]) == 1): #se pò fa cussì?
+                            vett[posiz][1].append(0)
+                        #break
 
-        for y in vett:
-            new_tuple.append(tuple(y))
 
-        return tuple(new_tuple)
+            elif(action == 'Put'):
+                vett.insert([lastPos + 1][1], vett[0][1]) #se pò fa cussì?
+
+            #elif(action == 'Hammer'):
+                #cose
 
 
 
 
 
-        #if(action == 'GetA' or action == 'GetB'):
-        #    new_state[0] = 1
-        #elif(action == 'PutAtoB'):
-            #new_state[0] = new_state.pop(1)
-            #new_state[1]
 
 
-    def check_solvability():
 
-    def path_cost(self, c, state1, action, state2):
-        if(action == 'GetA' or action == 'GetB'):
-            return c + 1
 
-    def h(self, node):
-        return 1
+
+            new_tuple = []
+
+            for index in vett:
+                new_tuple.append(tuple(index))
+
+            return tuple(new_tuple)
+
+
+
+
+
+            #if(action == 'GetA' or action == 'GetB'):
+            #    new_state[0] = 1
+            #elif(action == 'PutAtoB'):
+                #new_state[0] = new_state.pop(1)
+                #new_state[1]
+
+
+        def check_solvability(self, state):
+            """ Checks if the given state is solvable """
+            inversion = 0
+            for i in range(len(state)):
+                for j in range(i, len(state)):
+                    if state[i] > state[j] != 0:
+                        inversion += 1
+
+            return inversion % 2 == 0
+
+
+        def path_cost(self, c, state1, action, state2):
+            if(action == 'Get' or action == 'Hammer'):
+                return c + 1
+
+
+        def h(self, node):
+            return 1
 
 # __________
 
