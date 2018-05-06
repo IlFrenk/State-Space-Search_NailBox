@@ -11,7 +11,7 @@ from search import astar_search, NailBox, depth_limited_search, breadth_first_tr
 import utils
 
 def init():
-    state = ()
+    state = ((0, 0), (1,0), (2, 'a'), (3, 'b'), (4, 'c'), (5, 0), (6, 0))
     problem = NailBox(state)
     star = astar_search(problem)
     solution = star.solution()

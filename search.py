@@ -1,8 +1,10 @@
+# coding=utf-8
 """Search (Chapters 3-4)
 
 The way to use this code is to subclass Problem to create a class of problems,
 then create problem instances and solve them with calls to the various search
 functions."""
+
 """
 from utils import (
     is_in, argmin, argmax, argmax_random_tie, probability, weighted_sampler,
@@ -24,10 +26,10 @@ infinity = float('inf')
 
 def backspace(n):
     # print((b'\x08').decode(), end='')     # use \x08 char to go back
-    print('\r', end='')
+    print('\r', '')
 def print_line(nodes, maxDepth):
 	string="Max depth: " + maxDepth + " Nodes expanded: "+nodes
-	print(string,end='')
+	print(string, '')
 	backspace(len(string))
                      # use '\r' to go back
 
@@ -613,12 +615,11 @@ class Fontana(Problem):
 class NailBox(Problem):
     #a = scatola, b = coperchio, c = chiodo, 0 = vuoto
     #la posizione 0 è il braccio: 0 libero, 1 occupato
-    def __init__(self, initial, goal = ((0, 0), (), (), (), (), (), ())):
+    def __init__(self, initial, goal = ((0, 0), (1, 0), (2, 'c', 'b', 'a'), (3, 0), (4, 0), (5, 0), (6, 0))):
 
         self.goal = goal
-        self.initial = initial
+        #self.initial = initial
         self.lastPos = 0
-        self.count = 0
         Problem.__init__(self, initial, goal)
         def actions(self, state):
             possible_actions = ['Get', 'Put', 'Hammer']
@@ -628,13 +629,15 @@ class NailBox(Problem):
                 vett.append(list(i))
 
             for posiz in range(1, len(vett)):
-                #for posiz2 in range(1, len(???)):
                 if(vett[0][1] == 0):
                     #se il braccio è libero:
                     possible_actions.remove('Put')
-                    #posiz2!
-                    if(vett[posiz][1] != c or vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
-                        possible_actions.remove('Hammer')
+                    for posiz2 in range(1, len(vett[posiz])):
+                        if(posiz2>=3):
+                            #se nella posizione corrente ci sono 3 o piu elementi:
+                            if(vett[posiz][1] != c or vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
+                                #se i 3 elementi non sono in sequenza chiodo, coperchio, scatola:
+                                possible_actions.remove('Hammer')
                 else:
                     #se il braccio è occupato:
                     possible_actions.remove('Get')
@@ -658,24 +661,27 @@ class NailBox(Problem):
             if(action == 'Get'):
                 for posiz in range(1, len(vett)):
                     if(vett[posiz][1] != 0):
-                        vett[0][1] = vett[posiz][1]
+                        vett[0][1] = vett[posiz][1] #setta la posizione 1 del braccio con l'oggetto che ha gettato
                         self.lastPos = posiz
                         del vett[posiz][1]
-                        if(len(vett[posiz]) == 1): #se pò fa cussì?
-                            vett[posiz][1].append(0)
-                        #break
+                        if(len(vett[posiz]) == 1):
+                            #se ha gettato l'unico oggetto nella postazione:
+                            vett[posiz].append(0)
+                        break
 
 
-            elif(action == 'Put'):
-                vett.insert([lastPos + 1][1], vett[0][1]) #se pò fa cussì?
+            if(action == 'Put'):
+                vett[self.lastPos + 1].insert(1, vett[0][1]) #fa la put dell'oggetto nella posizione successiva in cui l'ha gettato
 
-            #elif(action == 'Hammer'):
-                #cose
-
-
-
-
-
+            if(action == 'Hammer'):
+                for posiz in range(1, len(vett)):
+                    for posiz2 in range(1, len(vett[posiz])):
+                        if(posiz2 >= 3):
+                            if(vett[posiz][1] == 'c' and vett[posiz][2] == 'b' and vett[posiz][3] == 'a'):
+                                del vett[posiz][1]
+                                del vett[posiz][2]
+                                del vett[posiz][3]
+                                vett[posiz].insert(1, 'cba')
 
 
 
@@ -689,29 +695,8 @@ class NailBox(Problem):
             return tuple(new_tuple)
 
 
-
-
-
-            #if(action == 'GetA' or action == 'GetB'):
-            #    new_state[0] = 1
-            #elif(action == 'PutAtoB'):
-                #new_state[0] = new_state.pop(1)
-                #new_state[1]
-
-
-        def check_solvability(self, state):
-            """ Checks if the given state is solvable """
-            inversion = 0
-            for i in range(len(state)):
-                for j in range(i, len(state)):
-                    if state[i] > state[j] != 0:
-                        inversion += 1
-
-            return inversion % 2 == 0
-
-
         def path_cost(self, c, state1, action, state2):
-            if(action == 'Get' or action == 'Hammer'):
+            if(action == 'Get' or action == 'Put' or action == 'Hammer'):
                 return c + 1
 
 
@@ -1550,9 +1535,9 @@ def print_boggle(board):
         if i % n == 0 and i > 0:
             print()
         if board[i] == 'Q':
-            print('Qu', end=' ')
+            print('Qu', ' ')
         else:
-            print(str(board[i]) + ' ', end=' ')
+            print(str(board[i]) + ' ', ' ')
     print()
 
 
