@@ -618,7 +618,6 @@ class NailBox(Problem):
     def __init__(self, initial, goal = ((0, 0), (1, 0), (2, 'c', 'b', 'a'), (3, 0), (4, 0), (5, 0), (6, 0))):
 
         self.goal = goal
-        #self.initial = initial
         self.lastPos = 0
         Problem.__init__(self, initial, goal)
         def actions(self, state):
@@ -632,7 +631,7 @@ class NailBox(Problem):
                 if(vett[0][1] == 0):
                     #se il braccio è libero:
                     possible_actions.remove('Put')
-                    for posiz2 in range(1, len(vett[posiz])):
+                    for posiz2 in range(1, len(posiz)):
                         if(posiz2>=3):
                             #se nella posizione corrente ci sono 3 o piu elementi:
                             if(vett[posiz][1] != c or vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
@@ -648,14 +647,14 @@ class NailBox(Problem):
 
 
         def result(self, state, action):
-            new_state = []
-            for k in range(1, len(state)):
-                j = list(k)
-                new_state.append(j)
+
+            nuovoStato = []
+            for i in range(1, len(state)):
+                nuovoStato.append((list(i)))
 
             vett = []
-            for i in state:
-                vett.append(list(i))
+            for j in state:
+                vett.append(list(j))
 
 
             if(action == 'Get'):
@@ -675,7 +674,7 @@ class NailBox(Problem):
 
             if(action == 'Hammer'):
                 for posiz in range(1, len(vett)):
-                    for posiz2 in range(1, len(vett[posiz])):
+                    for posiz2 in range(1, len(posiz)):
                         if(posiz2 >= 3):
                             if(vett[posiz][1] == 'c' and vett[posiz][2] == 'b' and vett[posiz][3] == 'a'):
                                 del vett[posiz][1]
@@ -687,12 +686,12 @@ class NailBox(Problem):
 
 
 
-            new_tuple = []
+            nuovaTupla = []
 
             for index in vett:
-                new_tuple.append(tuple(index))
+                nuovaTupla.append(tuple(index))
 
-            return tuple(new_tuple)
+            return tuple(nuovaTupla)
 
 
         def path_cost(self, c, state1, action, state2):
@@ -701,7 +700,24 @@ class NailBox(Problem):
 
 
         def h(self, node):
-            return 1
+
+            oraS = node.state
+            goalG = self.goal
+            dissimilarity = 0
+
+            vett = []
+            for i in oraS:
+                vett.append(list(i))
+
+            vett2 = []
+            for j in goalG:
+                vett2.append(list(j))
+
+            for posiz in range(0, len(oraS)-1):
+                if (oraS[posiz] != goalG[posiz]):
+                    dissimilarity += 1
+
+            return dissimilarity
 
 # __________
 
