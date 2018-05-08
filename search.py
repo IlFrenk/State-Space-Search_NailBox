@@ -614,7 +614,7 @@ class Fontana(Problem):
 
 class NailBox(Problem):
     #a = scatola, b = coperchio, c = chiodo, 0 = vuoto
-    #la posizione 0 è il braccio: 0 libero, 1 occupato
+    #la posizione 0 è il braccio: 0 significa libero; 'a', 'b', 'c', 'cba' significa occupato e indica cosa ha in mano
     def __init__(self, initial, goal = ((0, 0), (1, 0), (2, 'c', 'b', 'a'), (3, 0), (4, 0), (5, 0), (6, 0))):
 
         self.goal = goal
@@ -631,12 +631,14 @@ class NailBox(Problem):
                 if(vett[0][1] == 0):
                     #se il braccio è libero:
                     possible_actions.remove('Put')
-                    for posiz2 in range(1, len(posiz)):
+                    for posiz2 in range(1, len(vett[posiz])):
                         if(posiz2>=3):
                             #se nella posizione corrente ci sono 3 o piu elementi:
                             if(vett[posiz][1] != c or vett[posiz][2] != 'b' or vett[posiz][3] != 'a'):
                                 #se i 3 elementi non sono in sequenza chiodo, coperchio, scatola:
                                 possible_actions.remove('Hammer')
+                        else:
+                            possible_actions.remove('Hammer')
                 else:
                     #se il braccio è occupato:
                     possible_actions.remove('Get')
@@ -671,19 +673,17 @@ class NailBox(Problem):
 
             if(action == 'Put'):
                 vett[self.lastPos + 1].insert(1, vett[0][1]) #fa la put dell'oggetto nella posizione successiva in cui l'ha gettato
+                vett[0][1] = 0
 
             if(action == 'Hammer'):
                 for posiz in range(1, len(vett)):
-                    for posiz2 in range(1, len(posiz)):
+                    for posiz2 in range(1, len(vett[posiz])):
                         if(posiz2 >= 3):
                             if(vett[posiz][1] == 'c' and vett[posiz][2] == 'b' and vett[posiz][3] == 'a'):
                                 del vett[posiz][1]
                                 del vett[posiz][2]
                                 del vett[posiz][3]
                                 vett[posiz].insert(1, 'cba')
-
-
-
 
 
             nuovaTupla = []
