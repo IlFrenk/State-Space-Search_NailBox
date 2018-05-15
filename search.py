@@ -713,8 +713,8 @@ class NailBox(Problem):
             for j in goalG:
                 vett2.append(list(j))
 
-            for posiz in range(0, len(oraS)-1):
-                if (oraS[posiz] != goalG[posiz]):
+            for posiz in range(0, len(vett)-1):
+                if (vett[posiz] != vett2[posiz]):
                     dissimilarity += 1
 
             return dissimilarity
